@@ -148,6 +148,7 @@
     min-height: 1.2rem;
   }
 
+  /* Color display */
   .colors-row {
     display: flex;
     gap: 0.5rem;
@@ -202,6 +203,7 @@
     transition: width 0.1s linear;
   }
 
+  /* HSB Sliders */
   .slider-group {
     margin-bottom: 1.5rem;
     border: 1px solid var(--border);
@@ -292,6 +294,7 @@
   .color-dot.active { background: var(--accent); }
   .color-dot.done { background: var(--muted); }
 
+  /* Score & Results */
   .score-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -334,6 +337,7 @@
     color: var(--muted);
   }
 
+  /* Lobby */
   .lobby-code {
     font-family: var(--serif);
     font-size: 3.5rem;
@@ -474,6 +478,7 @@
   <div class="tagline">Farbgedächtnis</div>
 </header>
 
+<!-- HOME -->
 <div id="screen-home" class="screen active">
   <h2>Kannst du Farben erinnern?</h2>
   <p>Du siehst 1 Farbe — dann musst du sie aus dem Gedächtnis nachbilden. Einfach? Denk nochmal nach.</p>
@@ -491,6 +496,7 @@
   </div>
 </div>
 
+<!-- SOLO MENU -->
 <div id="screen-solo-menu" class="screen">
   <button class="back-link" onclick="showScreen('screen-home')">← zurück</button>
   <h2 style="margin-top:1rem">Singleplayer</h2>
@@ -503,6 +509,7 @@
   <button class="btn primary full" onclick="startSolo()">Spiel starten</button>
 </div>
 
+<!-- SOLO GAME -->
 <div id="screen-solo" class="screen">
   <div class="round-badge" id="sp-round-label">Runde 1 / 3</div>
   <div class="phase-label" id="sp-phase-label">Farben einprägen…</div>
@@ -539,6 +546,7 @@
   </div>
 </div>
 
+<!-- SOLO RESULTS -->
 <div id="screen-solo-results" class="screen">
   <h2>Runde abgeschlossen</h2>
   <div class="result-colors" id="sp-result-colors"></div>
@@ -560,6 +568,7 @@
   <button class="btn primary full" id="sp-continue-btn" onclick="spNextRound()">Nächste Runde →</button>
 </div>
 
+<!-- SOLO FINAL -->
 <div id="screen-solo-final" class="screen">
   <h2>Spiel beendet</h2>
   <div class="sp-score-display">
@@ -571,6 +580,7 @@
   <button class="btn full" style="margin-top:0.5rem" onclick="showScreen('screen-home')">Hauptmenü</button>
 </div>
 
+<!-- MULTIPLAYER MENU -->
 <div id="screen-mp-menu" class="screen">
   <button class="back-link" onclick="showScreen('screen-home')">← zurück</button>
   <h2 style="margin-top:1rem">Multiplayer</h2>
@@ -586,6 +596,7 @@
   <div class="error-msg" id="mp-error"></div>
 </div>
 
+<!-- LOBBY -->
 <div id="screen-lobby" class="screen">
   <div class="phase-label">Raumcode</div>
   <div class="lobby-code" id="lobby-code">—</div>
@@ -606,6 +617,7 @@
   <div class="status-bar" id="lobby-status">Warte auf Spieler…</div>
 </div>
 
+<!-- MP GAME -->
 <div id="screen-mp-game" class="screen">
   <div class="round-badge" id="mp-round-label">Runde 1 / 3</div>
   <div class="phase-label" id="mp-phase-label">Farben einprägen…</div>
@@ -649,6 +661,7 @@
   </div>
 </div>
 
+<!-- MP ROUND RESULTS -->
 <div id="screen-mp-results" class="screen">
   <div class="round-badge" id="mp-result-round">Rundenauswertung</div>
   <h2>Ergebnisse</h2>
@@ -657,6 +670,7 @@
   <div style="font-size:0.72rem;color:var(--muted);text-align:center;margin-top:1rem" id="mp-next-countdown"></div>
 </div>
 
+<!-- MP FINAL -->
 <div id="screen-mp-final" class="screen">
   <h2>Spiel beendet!</h2>
   <div class="players-list" id="mp-final-players"></div>
@@ -671,6 +685,8 @@ window.onerror = function(msg, src, line) {
   document.body.innerHTML = '';
   document.body.appendChild(d);
 };
+
+// ─── Utilities ───────────────────────────────────────────────────────────────
 
 function hsbToHex(h, s, b) {
   s /= 100; b /= 100;
@@ -699,6 +715,8 @@ function selectRounds(el, r) {
 }
 
 let soloRounds = 3;
+
+// ─── SOLO ─────────────────────────────────────────────────────────────────────
 
 let soloState = {
   colors: [], guesses: [], currentIdx: 0,
@@ -880,6 +898,8 @@ function soloShowFinal() {
   showScreen('screen-solo-final');
 }
 
+// ─── MULTIPLAYER ──────────────────────────────────────────────────────────────
+
 let ws = null;
 let mpState = {
   playerId: null, roomCode: null, isHost: false,
@@ -968,10 +988,10 @@ function handleMessage(msg) {
     case 'round_start':
       mpState.round = msg.round;
       mpState.totalRounds = msg.totalRounds;
-      mpState.currentColors = msg.colors;
+      mpState.currentColors = [msg.colors[0]];
       mpState.guesses = Array.from({ length: 1 }, () => ({ h: 180, s: 50, b: 50 }));
       mpState.currentIdx = 0;
-      showMPGame(msg.colors);
+      showMPGame(mpState.currentColors);
       break;
     case 'guess_phase':
       mpStartGuessing();
@@ -1113,7 +1133,7 @@ function showMPResults(msg) {
 
   const rc = document.getElementById('mp-result-colors');
   rc.innerHTML = '';
-  const colors = msg.colors;
+  const colors = (msg.colors || []).slice(0, 1);
   const myGuesses = msg.guesses[mpState.playerId] || [];
 
   colors.forEach((c, i) => {
@@ -1172,6 +1192,7 @@ function showMPFinal(results) {
   showScreen('screen-mp-final');
 }
 
+// Init preview
 updateSPPreview();
 updateMPPreview();
 </script>
