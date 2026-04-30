@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dialed — Farbgedächtnis</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet"></noscript>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -19,8 +20,8 @@
     --accent2: #f0c860;
     --danger: #f06060;
     --radius: 12px;
-    --mono: 'DM Mono', monospace;
-    --serif: 'Fraunces', serif;
+    --mono: 'DM Mono', 'Courier New', monospace;
+    --serif: 'Fraunces', Georgia, serif;
   }
 
   body {
@@ -31,6 +32,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    visibility: visible;
   }
 
   header {
@@ -652,6 +654,14 @@
 </div>
 
 <script>
+window.onerror = function(msg, src, line) {
+  var d = document.createElement('div');
+  d.style.cssText = 'color:#f06060;font-family:monospace;padding:2rem;background:#0e0e0e;min-height:100vh';
+  d.textContent = 'JS Fehler: ' + msg + ' (' + src + ':' + line + ')';
+  document.body.innerHTML = '';
+  document.body.appendChild(d);
+};
+
 // ─── Utilities ───────────────────────────────────────────────────────────────
 
 function hsbToHex(h, s, b) {
