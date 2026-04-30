@@ -148,7 +148,6 @@
     min-height: 1.2rem;
   }
 
-  /* Color display */
   .colors-row {
     display: flex;
     gap: 0.5rem;
@@ -203,7 +202,6 @@
     transition: width 0.1s linear;
   }
 
-  /* HSB Sliders */
   .slider-group {
     margin-bottom: 1.5rem;
     border: 1px solid var(--border);
@@ -226,16 +224,18 @@
     margin-bottom: 0.5rem;
   }
 
-  .slider-label { font-size: 0.68rem; color: var(--muted); width: 20px; flex-shrink: 0; }
+  .slider-label { font-size: 0.68rem; color: var(--muted); width: 110px; flex-shrink: 0; }
   .slider-val { font-size: 0.68rem; color: var(--text); width: 28px; text-align: right; flex-shrink: 0; }
 
   input[type="range"] {
     flex: 1;
     -webkit-appearance: none;
-    height: 3px;
+    appearance: none;
+    height: 6px;
     border-radius: 99px;
     outline: none;
     cursor: pointer;
+    background: var(--surface2);
   }
 
   input[type="range"]::-webkit-slider-thumb {
@@ -246,6 +246,27 @@
     background: var(--text);
     cursor: pointer;
     border: 2px solid var(--bg);
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--text);
+    cursor: pointer;
+    border: 2px solid var(--bg);
+  }
+
+  .hue-slider {
+    background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000) !important;
+  }
+
+  .sat-slider {
+    background: linear-gradient(to right, #777777, #ff4040) !important;
+  }
+
+  .bright-slider {
+    background: linear-gradient(to right, #000000, #ffffff) !important;
   }
 
   .color-nav {
@@ -271,7 +292,6 @@
   .color-dot.active { background: var(--accent); }
   .color-dot.done { background: var(--muted); }
 
-  /* Score & Results */
   .score-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -314,7 +334,6 @@
     color: var(--muted);
   }
 
-  /* Lobby */
   .lobby-code {
     font-family: var(--serif);
     font-size: 3.5rem;
@@ -444,6 +463,7 @@
     .mode-grid { grid-template-columns: 1fr; }
     .lobby-code { font-size: 2.5rem; }
     .sp-score-big { font-size: 3.5rem; }
+    .slider-label { width: 92px; font-size: 0.62rem; }
   }
 </style>
 </head>
@@ -454,7 +474,6 @@
   <div class="tagline">Farbgedächtnis</div>
 </header>
 
-<!-- HOME -->
 <div id="screen-home" class="screen active">
   <h2>Kannst du Farben erinnern?</h2>
   <p>Du siehst 1 Farbe — dann musst du sie aus dem Gedächtnis nachbilden. Einfach? Denk nochmal nach.</p>
@@ -472,7 +491,6 @@
   </div>
 </div>
 
-<!-- SOLO MENU -->
 <div id="screen-solo-menu" class="screen">
   <button class="back-link" onclick="showScreen('screen-home')">← zurück</button>
   <h2 style="margin-top:1rem">Singleplayer</h2>
@@ -485,7 +503,6 @@
   <button class="btn primary full" onclick="startSolo()">Spiel starten</button>
 </div>
 
-<!-- SOLO GAME -->
 <div id="screen-solo" class="screen">
   <div class="round-badge" id="sp-round-label">Runde 1 / 3</div>
   <div class="phase-label" id="sp-phase-label">Farben einprägen…</div>
@@ -500,18 +517,18 @@
     <div class="slider-group">
       <div class="slider-preview" id="sp-preview"></div>
       <div class="slider-row">
-        <span class="slider-label">H</span>
-        <input type="range" min="0" max="359" value="180" id="sp-h" oninput="updateSPPreview()">
+        <span class="slider-label">Farbton</span>
+        <input class="hue-slider" type="range" min="0" max="359" value="180" id="sp-h" oninput="updateSPPreview()">
         <span class="slider-val" id="sp-h-val">180</span>
       </div>
       <div class="slider-row">
-        <span class="slider-label">S</span>
-        <input type="range" min="0" max="100" value="50" id="sp-s" oninput="updateSPPreview()">
+        <span class="slider-label">Sättigung</span>
+        <input class="sat-slider" type="range" min="0" max="100" value="50" id="sp-s" oninput="updateSPPreview()">
         <span class="slider-val" id="sp-s-val">50</span>
       </div>
       <div class="slider-row">
-        <span class="slider-label">B</span>
-        <input type="range" min="0" max="100" value="50" id="sp-b" oninput="updateSPPreview()">
+        <span class="slider-label">Helligkeit</span>
+        <input class="bright-slider" type="range" min="0" max="100" value="50" id="sp-b" oninput="updateSPPreview()">
         <span class="slider-val" id="sp-b-val">50</span>
       </div>
     </div>
@@ -522,7 +539,6 @@
   </div>
 </div>
 
-<!-- SOLO RESULTS -->
 <div id="screen-solo-results" class="screen">
   <h2>Runde abgeschlossen</h2>
   <div class="result-colors" id="sp-result-colors"></div>
@@ -544,7 +560,6 @@
   <button class="btn primary full" id="sp-continue-btn" onclick="spNextRound()">Nächste Runde →</button>
 </div>
 
-<!-- SOLO FINAL -->
 <div id="screen-solo-final" class="screen">
   <h2>Spiel beendet</h2>
   <div class="sp-score-display">
@@ -556,7 +571,6 @@
   <button class="btn full" style="margin-top:0.5rem" onclick="showScreen('screen-home')">Hauptmenü</button>
 </div>
 
-<!-- MULTIPLAYER MENU -->
 <div id="screen-mp-menu" class="screen">
   <button class="back-link" onclick="showScreen('screen-home')">← zurück</button>
   <h2 style="margin-top:1rem">Multiplayer</h2>
@@ -572,7 +586,6 @@
   <div class="error-msg" id="mp-error"></div>
 </div>
 
-<!-- LOBBY -->
 <div id="screen-lobby" class="screen">
   <div class="phase-label">Raumcode</div>
   <div class="lobby-code" id="lobby-code">—</div>
@@ -593,7 +606,6 @@
   <div class="status-bar" id="lobby-status">Warte auf Spieler…</div>
 </div>
 
-<!-- MP GAME -->
 <div id="screen-mp-game" class="screen">
   <div class="round-badge" id="mp-round-label">Runde 1 / 3</div>
   <div class="phase-label" id="mp-phase-label">Farben einprägen…</div>
@@ -607,18 +619,18 @@
     <div class="slider-group">
       <div class="slider-preview" id="mp-preview"></div>
       <div class="slider-row">
-        <span class="slider-label">H</span>
-        <input type="range" min="0" max="359" value="180" id="mp-h" oninput="updateMPPreview()">
+        <span class="slider-label">Farbton</span>
+        <input class="hue-slider" type="range" min="0" max="359" value="180" id="mp-h" oninput="updateMPPreview()">
         <span class="slider-val" id="mp-h-val">180</span>
       </div>
       <div class="slider-row">
-        <span class="slider-label">S</span>
-        <input type="range" min="0" max="100" value="50" id="mp-s" oninput="updateMPPreview()">
+        <span class="slider-label">Sättigung</span>
+        <input class="sat-slider" type="range" min="0" max="100" value="50" id="mp-s" oninput="updateMPPreview()">
         <span class="slider-val" id="mp-s-val">50</span>
       </div>
       <div class="slider-row">
-        <span class="slider-label">B</span>
-        <input type="range" min="0" max="100" value="50" id="mp-b" oninput="updateMPPreview()">
+        <span class="slider-label">Helligkeit</span>
+        <input class="bright-slider" type="range" min="0" max="100" value="50" id="mp-b" oninput="updateMPPreview()">
         <span class="slider-val" id="mp-b-val">50</span>
       </div>
     </div>
@@ -637,7 +649,6 @@
   </div>
 </div>
 
-<!-- MP ROUND RESULTS -->
 <div id="screen-mp-results" class="screen">
   <div class="round-badge" id="mp-result-round">Rundenauswertung</div>
   <h2>Ergebnisse</h2>
@@ -646,7 +657,6 @@
   <div style="font-size:0.72rem;color:var(--muted);text-align:center;margin-top:1rem" id="mp-next-countdown"></div>
 </div>
 
-<!-- MP FINAL -->
 <div id="screen-mp-final" class="screen">
   <h2>Spiel beendet!</h2>
   <div class="players-list" id="mp-final-players"></div>
@@ -661,8 +671,6 @@ window.onerror = function(msg, src, line) {
   document.body.innerHTML = '';
   document.body.appendChild(d);
 };
-
-// ─── Utilities ───────────────────────────────────────────────────────────────
 
 function hsbToHex(h, s, b) {
   s /= 100; b /= 100;
@@ -691,8 +699,6 @@ function selectRounds(el, r) {
 }
 
 let soloRounds = 3;
-
-// ─── SOLO ─────────────────────────────────────────────────────────────────────
 
 let soloState = {
   colors: [], guesses: [], currentIdx: 0,
@@ -733,7 +739,7 @@ function soloPlayRound() {
   });
 
   showScreen('screen-solo');
-  soloShowTimer(4000, 'sp-timer', () => soloStartGuessing());
+  soloShowTimer(8000, 'sp-timer', () => soloStartGuessing());
 }
 
 function soloShowTimer(duration, barId, cb) {
@@ -873,8 +879,6 @@ function soloShowFinal() {
   document.getElementById('sp-final-msg').textContent = m[2];
   showScreen('screen-solo-final');
 }
-
-// ─── MULTIPLAYER ──────────────────────────────────────────────────────────────
 
 let ws = null;
 let mpState = {
@@ -1032,7 +1036,7 @@ function showMPGame(colors) {
   });
 
   showScreen('screen-mp-game');
-  mpShowTimer(4000, 'mp-timer', () => {});
+  mpShowTimer(8000, 'mp-timer', () => {});
 }
 
 function mpShowTimer(duration, barId, cb) {
@@ -1168,7 +1172,6 @@ function showMPFinal(results) {
   showScreen('screen-mp-final');
 }
 
-// Init preview
 updateSPPreview();
 updateMPPreview();
 </script>
