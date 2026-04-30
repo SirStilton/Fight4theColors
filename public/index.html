@@ -3,121 +3,1174 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dialed – 1 Color Mode</title>
-
+<title>Dialed — Farbgedächtnis</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet"></noscript>
 <style>
-body {
-  background: #0e0e0e;
-  color: white;
-  font-family: monospace;
-  text-align: center;
-  padding: 2rem;
-}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-.color {
-  width: 200px;
-  height: 200px;
-  margin: 2rem auto;
-  border-radius: 12px;
-}
+  :root {
+    --bg: #0e0e0e;
+    --surface: #161616;
+    --surface2: #1f1f1f;
+    --border: #2a2a2a;
+    --text: #f0ede6;
+    --muted: #888;
+    --accent: #c8f060;
+    --accent2: #f0c860;
+    --danger: #f06060;
+    --radius: 12px;
+    --mono: 'DM Mono', 'Courier New', monospace;
+    --serif: 'Fraunces', Georgia, serif;
+  }
 
-.hidden {
-  display: none;
-}
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    visibility: visible;
+  }
 
-button {
-  padding: 10px 20px;
-  margin: 5px;
-  cursor: pointer;
-}
+  header {
+    width: 100%;
+    max-width: 700px;
+    padding: 2rem 1.5rem 1rem;
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+  }
 
-input[type=range] {
-  width: 80%;
-}
+  .logo {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 2rem;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  .logo span { color: var(--accent); font-style: italic; }
+
+  .tagline {
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .screen { display: none; width: 100%; max-width: 700px; padding: 1rem 1.5rem 3rem; }
+  .screen.active { display: block; }
+
+  h2 {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+    color: var(--text);
+  }
+
+  p { color: var(--muted); font-size: 0.8rem; line-height: 1.7; margin-bottom: 1rem; }
+
+  .btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: transparent;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+  }
+
+  .btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(200,240,96,0.05); }
+  .btn:active { transform: scale(0.98); }
+  .btn.primary { background: var(--accent); color: #0e0e0e; border-color: var(--accent); font-weight: 500; }
+  .btn.primary:hover { background: #d4f470; border-color: #d4f470; color: #0e0e0e; }
+  .btn.danger { border-color: var(--danger); color: var(--danger); }
+  .btn.full { width: 100%; text-align: center; display: block; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .mode-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .mode-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--surface);
+  }
+
+  .mode-card:hover { border-color: var(--accent); }
+  .mode-card h3 { font-size: 1rem; font-weight: 500; margin-bottom: 0.4rem; }
+  .mode-card p { font-size: 0.72rem; color: var(--muted); margin: 0; }
+  .mode-card .icon { font-size: 1.8rem; margin-bottom: 0.75rem; }
+
+  input[type="text"], input[type="number"] {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  input[type="text"]:focus, input[type="number"]:focus { border-color: var(--accent); }
+  input::placeholder { color: var(--muted); }
+
+  label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 0.4rem; }
+
+  .row { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1rem; }
+  .row input { margin-bottom: 0; flex: 1; }
+
+  .error-msg {
+    color: var(--danger);
+    font-size: 0.75rem;
+    margin-top: -0.5rem;
+    margin-bottom: 0.75rem;
+    min-height: 1.2rem;
+  }
+
+  /* Color display */
+  .colors-row {
+    display: flex;
+    gap: 0.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .color-swatch {
+    flex: 1;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .color-swatch.covered {
+    background: var(--surface2) !important;
+    border: 1px solid var(--border);
+  }
+
+  .color-swatch.covered::after {
+    content: '?';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-size: 1.2rem;
+  }
+
+  .phase-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .timer-bar-wrap {
+    height: 3px;
+    background: var(--surface2);
+    border-radius: 99px;
+    margin: 0.75rem 0 1.5rem;
+    overflow: hidden;
+  }
+
+  .timer-bar {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 99px;
+    transition: width 0.1s linear;
+  }
+
+  /* HSB Sliders */
+  .slider-group {
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    background: var(--surface);
+  }
+
+  .slider-preview {
+    height: 48px;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    transition: background 0.05s;
+  }
+
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .slider-label { font-size: 0.68rem; color: var(--muted); width: 20px; flex-shrink: 0; }
+  .slider-val { font-size: 0.68rem; color: var(--text); width: 28px; text-align: right; flex-shrink: 0; }
+
+  input[type="range"] {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 3px;
+    border-radius: 99px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--text);
+    cursor: pointer;
+    border: 2px solid var(--bg);
+  }
+
+  .color-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .color-dots {
+    display: flex;
+    gap: 0.4rem;
+  }
+
+  .color-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: all 0.15s;
+  }
+
+  .color-dot.active { background: var(--accent); }
+  .color-dot.done { background: var(--muted); }
+
+  /* Score & Results */
+  .score-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .score-card .name { font-size: 0.9rem; }
+  .score-card .pts { font-size: 1.1rem; font-weight: 500; color: var(--accent); }
+  .score-card .rank { font-size: 0.7rem; color: var(--muted); width: 24px; }
+  .score-card.winner { border-color: var(--accent2); }
+  .score-card.winner .pts { color: var(--accent2); }
+
+  .result-colors {
+    display: flex;
+    gap: 0.4rem;
+    margin: 1rem 0;
+  }
+
+  .result-pair {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: center;
+  }
+
+  .result-swatch {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 6px;
+  }
+
+  .result-score-mini {
+    font-size: 0.6rem;
+    color: var(--muted);
+  }
+
+  /* Lobby */
+  .lobby-code {
+    font-family: var(--serif);
+    font-size: 3.5rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin: 0.5rem 0 1.5rem;
+  }
+
+  .players-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .player-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    font-size: 0.8rem;
+  }
+
+  .player-pill .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .player-pill .host-badge {
+    font-size: 0.6rem;
+    color: var(--accent2);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-left: auto;
+  }
+
+  .status-bar {
+    font-size: 0.72rem;
+    color: var(--muted);
+    padding: 0.5rem 0;
+    border-top: 1px solid var(--border);
+    margin-top: 1rem;
+  }
+
+  .round-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 0.25rem 0.75rem;
+    border-radius: 99px;
+    margin-bottom: 1rem;
+  }
+
+  .finished-count {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin: 0.5rem 0;
+    text-align: center;
+  }
+
+  .back-link {
+    font-size: 0.72rem;
+    color: var(--muted);
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    background: none;
+    font-family: var(--mono);
+    letter-spacing: 0.04em;
+    padding: 0.25rem 0;
+  }
+
+  .back-link:hover { color: var(--text); }
+
+  .sp-score-display {
+    text-align: center;
+    margin: 2rem 0;
+  }
+
+  .sp-score-big {
+    font-family: var(--serif);
+    font-size: 5rem;
+    font-weight: 300;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .sp-score-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.5rem; }
+
+  .waiting-anim {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin: 1rem 0;
+  }
+
+  .waiting-anim span {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+
+  .waiting-anim span:nth-child(2) { animation-delay: 0.2s; }
+  .waiting-anim span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes pulse {
+    0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+    40% { opacity: 1; transform: scale(1); }
+  }
+
+  .reveal-anim { animation: revealIn 0.4s ease; }
+  @keyframes revealIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .separator { height: 1px; background: var(--border); margin: 1.5rem 0; }
+
+  @media (max-width: 500px) {
+    .mode-grid { grid-template-columns: 1fr; }
+    .lobby-code { font-size: 2.5rem; }
+    .sp-score-big { font-size: 3.5rem; }
+  }
 </style>
 </head>
-
 <body>
 
-<h1>🎯 Dialed – 1 Color</h1>
+<header>
+  <div class="logo">dial<span>ed</span></div>
+  <div class="tagline">Farbgedächtnis</div>
+</header>
 
-<div id="game">
-  <div id="colorBox" class="color"></div>
-
-  <div id="controls" class="hidden">
-    <p>Rekonstruiere die Farbe:</p>
-
-    H: <input type="range" id="h" min="0" max="359"><br>
-    S: <input type="range" id="s" min="0" max="100"><br>
-    B: <input type="range" id="b" min="0" max="100"><br>
-
-    <button onclick="submit()">Fertig</button>
+<!-- HOME -->
+<div id="screen-home" class="screen active">
+  <h2>Kannst du Farben erinnern?</h2>
+  <p>Du siehst 1 Farbe — dann musst du sie aus dem Gedächtnis nachbilden. Einfach? Denk nochmal nach.</p>
+  <div class="mode-grid">
+    <div class="mode-card" onclick="showScreen('screen-solo-menu')">
+      <div class="icon">◎</div>
+      <h3>Singleplayer</h3>
+      <p>Trainiere allein, 3 oder 5 Runden, eigenes Tempo</p>
+    </div>
+    <div class="mode-card" onclick="showScreen('screen-mp-menu')">
+      <div class="icon">◈</div>
+      <h3>Multiplayer</h3>
+      <p>Live gegen Freunde — gleichzeitig, selbe Farben</p>
+    </div>
   </div>
+</div>
 
-  <h2 id="score"></h2>
+<!-- SOLO MENU -->
+<div id="screen-solo-menu" class="screen">
+  <button class="back-link" onclick="showScreen('screen-home')">← zurück</button>
+  <h2 style="margin-top:1rem">Singleplayer</h2>
+  <label>Anzahl Runden</label>
+  <div style="display:flex;gap:0.5rem;margin-bottom:1.5rem">
+    <button class="btn round-sel active-sel" data-r="3" onclick="selectRounds(this,3)">3</button>
+    <button class="btn round-sel" data-r="5" onclick="selectRounds(this,5)">5</button>
+    <button class="btn round-sel" data-r="10" onclick="selectRounds(this,10)">10</button>
+  </div>
+  <button class="btn primary full" onclick="startSolo()">Spiel starten</button>
+</div>
+
+<!-- SOLO GAME -->
+<div id="screen-solo" class="screen">
+  <div class="round-badge" id="sp-round-label">Runde 1 / 3</div>
+  <div class="phase-label" id="sp-phase-label">Farben einprägen…</div>
+  <div class="timer-bar-wrap"><div class="timer-bar" id="sp-timer" style="width:100%"></div></div>
+  <div class="colors-row" id="sp-colors"></div>
+
+  <div id="sp-guess-area" style="display:none">
+    <div class="color-nav">
+      <span class="phase-label">Farbe <span id="sp-cur-idx">1</span> von 1</span>
+      <div class="color-dots" id="sp-dots"></div>
+    </div>
+    <div class="slider-group">
+      <div class="slider-preview" id="sp-preview"></div>
+      <div class="slider-row">
+        <span class="slider-label">H</span>
+        <input type="range" min="0" max="359" value="180" id="sp-h" oninput="updateSPPreview()">
+        <span class="slider-val" id="sp-h-val">180</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">S</span>
+        <input type="range" min="0" max="100" value="50" id="sp-s" oninput="updateSPPreview()">
+        <span class="slider-val" id="sp-s-val">50</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">B</span>
+        <input type="range" min="0" max="100" value="50" id="sp-b" oninput="updateSPPreview()">
+        <span class="slider-val" id="sp-b-val">50</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:0.75rem">
+      <button class="btn" id="sp-prev-btn" onclick="spNavigate(-1)">← Zurück</button>
+      <button class="btn primary" style="flex:1" id="sp-next-btn" onclick="spNavigate(1)">Weiter →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SOLO RESULTS -->
+<div id="screen-solo-results" class="screen">
+  <h2>Runde abgeschlossen</h2>
+  <div class="result-colors" id="sp-result-colors"></div>
+  <div class="sp-score-display">
+    <div class="sp-score-big" id="sp-round-score">0</div>
+    <div class="sp-score-label">Punkte diese Runde</div>
+  </div>
+  <div class="separator"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+    <div>
+      <div class="phase-label">Gesamtpunkte</div>
+      <div style="font-size:1.5rem;font-weight:500;color:var(--accent2)" id="sp-total-score">0</div>
+    </div>
+    <div>
+      <div class="phase-label" style="text-align:right">Runde</div>
+      <div style="font-size:1.5rem;color:var(--muted);text-align:right" id="sp-round-progress">1/3</div>
+    </div>
+  </div>
+  <button class="btn primary full" id="sp-continue-btn" onclick="spNextRound()">Nächste Runde →</button>
+</div>
+
+<!-- SOLO FINAL -->
+<div id="screen-solo-final" class="screen">
+  <h2>Spiel beendet</h2>
+  <div class="sp-score-display">
+    <div class="sp-score-big" id="sp-final-score">0</div>
+    <div class="sp-score-label">Gesamtpunkte</div>
+  </div>
+  <div style="margin:1rem 0 2rem;font-size:0.8rem;color:var(--muted)" id="sp-final-msg"></div>
+  <button class="btn primary full" onclick="startSolo()">Nochmal spielen</button>
+  <button class="btn full" style="margin-top:0.5rem" onclick="showScreen('screen-home')">Hauptmenü</button>
+</div>
+
+<!-- MULTIPLAYER MENU -->
+<div id="screen-mp-menu" class="screen">
+  <button class="back-link" onclick="showScreen('screen-home')">← zurück</button>
+  <h2 style="margin-top:1rem">Multiplayer</h2>
+  <label>Dein Name</label>
+  <input type="text" id="mp-name" placeholder="Spielername" maxlength="16">
+  <div class="separator"></div>
+  <button class="btn primary full" onclick="createRoom()">Raum erstellen</button>
+  <div style="text-align:center;color:var(--muted);font-size:0.72rem;margin:0.75rem 0">oder</div>
+  <div class="row">
+    <input type="text" id="mp-join-code" placeholder="RAUMCODE" maxlength="5" style="text-transform:uppercase;letter-spacing:0.15em">
+    <button class="btn" onclick="joinRoom()">Beitreten</button>
+  </div>
+  <div class="error-msg" id="mp-error"></div>
+</div>
+
+<!-- LOBBY -->
+<div id="screen-lobby" class="screen">
+  <div class="phase-label">Raumcode</div>
+  <div class="lobby-code" id="lobby-code">—</div>
+  <p>Teile diesen Code mit deinen Freunden. Das Spiel beginnt, wenn der Host startet.</p>
+  <label>Anzahl Runden</label>
+  <div style="display:flex;gap:0.5rem;margin-bottom:1.5rem" id="rounds-sel-wrap">
+    <button class="btn round-sel active-sel" data-r="3" onclick="selectMPRounds(this,3)">3</button>
+    <button class="btn round-sel" data-r="5" onclick="selectMPRounds(this,5)">5</button>
+    <button class="btn round-sel" data-r="10" onclick="selectMPRounds(this,10)">10</button>
+  </div>
+  <div class="players-list" id="lobby-players"></div>
+  <div class="error-msg" id="lobby-error"></div>
+  <button class="btn primary full" id="start-game-btn" onclick="sendStartGame()" style="display:none">Spiel starten</button>
+  <div class="waiting-anim" id="lobby-waiting" style="display:none">
+    <span></span><span></span><span></span>
+    <span style="font-size:0.72rem;color:var(--muted);margin-left:4px">Warte auf Host…</span>
+  </div>
+  <div class="status-bar" id="lobby-status">Warte auf Spieler…</div>
+</div>
+
+<!-- MP GAME -->
+<div id="screen-mp-game" class="screen">
+  <div class="round-badge" id="mp-round-label">Runde 1 / 3</div>
+  <div class="phase-label" id="mp-phase-label">Farben einprägen…</div>
+  <div class="timer-bar-wrap"><div class="timer-bar" id="mp-timer" style="width:100%"></div></div>
+  <div class="colors-row" id="mp-colors"></div>
+  <div id="mp-guess-area" style="display:none">
+    <div class="color-nav">
+      <span class="phase-label">Farbe <span id="mp-cur-idx">1</span> von 1</span>
+      <div class="color-dots" id="mp-dots"></div>
+    </div>
+    <div class="slider-group">
+      <div class="slider-preview" id="mp-preview"></div>
+      <div class="slider-row">
+        <span class="slider-label">H</span>
+        <input type="range" min="0" max="359" value="180" id="mp-h" oninput="updateMPPreview()">
+        <span class="slider-val" id="mp-h-val">180</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">S</span>
+        <input type="range" min="0" max="100" value="50" id="mp-s" oninput="updateMPPreview()">
+        <span class="slider-val" id="mp-s-val">50</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">B</span>
+        <input type="range" min="0" max="100" value="50" id="mp-b" oninput="updateMPPreview()">
+        <span class="slider-val" id="mp-b-val">50</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:0.75rem">
+      <button class="btn" id="mp-prev-btn" onclick="mpNavigate(-1)">← Zurück</button>
+      <button class="btn primary" style="flex:1" id="mp-next-btn" onclick="mpNavigate(1)">Weiter →</button>
+    </div>
+    <div class="finished-count" id="mp-finished-count"></div>
+  </div>
+  <div id="mp-waiting-phase" style="display:none">
+    <div class="waiting-anim" style="justify-content:center">
+      <span></span><span></span><span></span>
+    </div>
+    <p style="text-align:center;margin-top:0.75rem" id="mp-wait-msg">Warte auf andere Spieler…</p>
+    <div class="finished-count" id="mp-finished-count2"></div>
+  </div>
+</div>
+
+<!-- MP ROUND RESULTS -->
+<div id="screen-mp-results" class="screen">
+  <div class="round-badge" id="mp-result-round">Rundenauswertung</div>
+  <h2>Ergebnisse</h2>
+  <div class="result-colors" id="mp-result-colors"></div>
+  <div class="players-list" id="mp-result-players"></div>
+  <div style="font-size:0.72rem;color:var(--muted);text-align:center;margin-top:1rem" id="mp-next-countdown"></div>
+</div>
+
+<!-- MP FINAL -->
+<div id="screen-mp-final" class="screen">
+  <h2>Spiel beendet!</h2>
+  <div class="players-list" id="mp-final-players"></div>
+  <div id="mp-final-btns" style="margin-top:1.5rem"></div>
 </div>
 
 <script>
-// SETTINGS
-let color;
-let guess = {h:180,s:50,b:50};
+window.onerror = function(msg, src, line) {
+  var d = document.createElement('div');
+  d.style.cssText = 'color:#f06060;font-family:monospace;padding:2rem;background:#0e0e0e;min-height:100vh';
+  d.textContent = 'JS Fehler: ' + msg + ' (' + src + ':' + line + ')';
+  document.body.innerHTML = '';
+  document.body.appendChild(d);
+};
 
-// UTILS
+// ─── Utilities ───────────────────────────────────────────────────────────────
+
 function hsbToHex(h, s, b) {
-  s/=100; b/=100;
-  const k = n => (n + h/60)%6;
-  const f = n => b - b*s*Math.max(0,Math.min(k(n),4-k(n),1));
-  return "#" + [f(5),f(3),f(1)].map(x =>
-    Math.round(x*255).toString(16).padStart(2,"0")
-  ).join("");
+  s /= 100; b /= 100;
+  const k = n => (n + h / 60) % 6;
+  const f = n => b - b * s * Math.max(0, Math.min(k(n), 4 - k(n), 1));
+  return '#' + [f(5), f(3), f(1)].map(x => Math.round(x * 255).toString(16).padStart(2, '0')).join('');
 }
 
-function calcScore(a,b){
-  const dh=Math.min(Math.abs(a.h-b.h),360-Math.abs(a.h-b.h));
-  const ds=Math.abs(a.s-b.s);
-  const db=Math.abs(a.b-b.b);
-  const max=Math.sqrt(180*180+100*100+100*100);
-  return Math.round((1-Math.sqrt(dh*dh+ds*ds+db*db)/max)*100);
+function calcScore(orig, guess) {
+  const dh = Math.min(Math.abs(orig.h - guess.h), 360 - Math.abs(orig.h - guess.h));
+  const ds = Math.abs(orig.s - guess.s);
+  const db = Math.abs(orig.b - guess.b);
+  const maxD = Math.sqrt(180 * 180 + 100 * 100 + 100 * 100);
+  return Math.max(0, Math.round((1 - Math.sqrt(dh*dh + ds*ds + db*db) / maxD) * 100));
 }
 
-// GAME
-function start(){
-  color = {
-    h: Math.random()*360|0,
-    s: Math.random()*60+30|0,
-    b: Math.random()*50+30|0
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function selectRounds(el, r) {
+  document.querySelectorAll('.round-sel').forEach(b => b.classList.remove('active-sel'));
+  el.classList.add('active-sel');
+  soloRounds = r;
+}
+
+let soloRounds = 3;
+
+// ─── SOLO ─────────────────────────────────────────────────────────────────────
+
+let soloState = {
+  colors: [], guesses: [], currentIdx: 0,
+  round: 1, totalRounds: 3, totalScore: 0, timer: null
+};
+
+function generateColors(n = 5) {
+  return Array.from({ length: n }, () => ({
+    h: Math.floor(Math.random() * 360),
+    s: Math.floor(Math.random() * 60) + 30,
+    b: Math.floor(Math.random() * 50) + 30
+  }));
+}
+
+function startSolo() {
+  soloState.totalRounds = soloRounds;
+  soloState.round = 1;
+  soloState.totalScore = 0;
+  soloPlayRound();
+}
+
+function soloPlayRound() {
+  soloState.colors = generateColors(1);
+  soloState.guesses = Array.from({ length: 1 }, () => ({ h: 180, s: 50, b: 50 }));
+  soloState.currentIdx = 0;
+
+  document.getElementById('sp-round-label').textContent = `Runde ${soloState.round} / ${soloState.totalRounds}`;
+  document.getElementById('sp-phase-label').textContent = 'Farben einprägen…';
+  document.getElementById('sp-guess-area').style.display = 'none';
+
+  const row = document.getElementById('sp-colors');
+  row.innerHTML = '';
+  soloState.colors.forEach(c => {
+    const s = document.createElement('div');
+    s.className = 'color-swatch';
+    s.style.background = hsbToHex(c.h, c.s, c.b);
+    row.appendChild(s);
+  });
+
+  showScreen('screen-solo');
+  soloShowTimer(4000, 'sp-timer', () => soloStartGuessing());
+}
+
+function soloShowTimer(duration, barId, cb) {
+  clearInterval(soloState.timer);
+  const bar = document.getElementById(barId);
+  const start = Date.now();
+  bar.style.width = '100%';
+  soloState.timer = setInterval(() => {
+    const elapsed = Date.now() - start;
+    const pct = Math.max(0, 100 - (elapsed / duration * 100));
+    bar.style.width = pct + '%';
+    if (elapsed >= duration) {
+      clearInterval(soloState.timer);
+      cb();
+    }
+  }, 50);
+}
+
+function soloStartGuessing() {
+  document.getElementById('sp-phase-label').textContent = 'Farben nachbilden';
+  const swatches = document.querySelectorAll('#sp-colors .color-swatch');
+  swatches.forEach(s => s.classList.add('covered'));
+  document.getElementById('sp-guess-area').style.display = 'block';
+  document.getElementById('sp-timer').style.width = '0%';
+  soloLoadGuess(0);
+  buildDots('sp-dots', 1);
+}
+
+function buildDots(id, n) {
+  const wrap = document.getElementById(id);
+  wrap.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const d = document.createElement('div');
+    d.className = 'color-dot' + (i === 0 ? ' active' : '');
+    wrap.appendChild(d);
+  }
+}
+
+function soloLoadGuess(idx) {
+  soloState.currentIdx = idx;
+  const g = soloState.guesses[idx];
+  document.getElementById('sp-cur-idx').textContent = idx + 1;
+  document.getElementById('sp-h').value = g.h;
+  document.getElementById('sp-s').value = g.s;
+  document.getElementById('sp-b').value = g.b;
+  updateSPPreview();
+  updateDots('sp-dots', idx, soloState.guesses.length);
+  document.getElementById('sp-prev-btn').disabled = idx === 0;
+  document.getElementById('sp-next-btn').textContent = idx === soloState.guesses.length - 1 ? 'Auswerten ✓' : 'Weiter →';
+}
+
+function updateDots(id, cur, total) {
+  const dots = document.querySelectorAll(`#${id} .color-dot`);
+  dots.forEach((d, i) => {
+    d.className = 'color-dot' + (i === cur ? ' active' : i < cur ? ' done' : '');
+  });
+}
+
+function saveSPGuess() {
+  soloState.guesses[soloState.currentIdx] = {
+    h: parseInt(document.getElementById('sp-h').value),
+    s: parseInt(document.getElementById('sp-s').value),
+    b: parseInt(document.getElementById('sp-b').value)
   };
-
-  document.getElementById("colorBox").style.background =
-    hsbToHex(color.h,color.s,color.b);
-
-  setTimeout(()=>{
-    document.getElementById("colorBox").style.background="#222";
-    document.getElementById("controls").classList.remove("hidden");
-  },2000);
 }
 
-function submit(){
-  guess = {
-    h:+h.value,
-    s:+s.value,
-    b:+b.value
+function spNavigate(dir) {
+  saveSPGuess();
+  const next = soloState.currentIdx + dir;
+  if (next < 0) return;
+  if (next >= soloState.guesses.length) { soloFinishRound(); return; }
+  soloLoadGuess(next);
+}
+
+function updateSPPreview() {
+  const h = document.getElementById('sp-h').value;
+  const s = document.getElementById('sp-s').value;
+  const b = document.getElementById('sp-b').value;
+  document.getElementById('sp-h-val').textContent = h;
+  document.getElementById('sp-s-val').textContent = s;
+  document.getElementById('sp-b-val').textContent = b;
+  document.getElementById('sp-preview').style.background = hsbToHex(+h, +s, +b);
+}
+
+function soloFinishRound() {
+  saveSPGuess();
+  let roundScore = 0;
+  const colorScores = soloState.guesses.map((g, i) => {
+    const sc = calcScore(soloState.colors[i], g);
+    roundScore += sc;
+    return sc;
+  });
+  const avg = Math.round(roundScore / soloState.colors.length);
+  soloState.totalScore += avg;
+
+  const rc = document.getElementById('sp-result-colors');
+  rc.innerHTML = '';
+  soloState.colors.forEach((c, i) => {
+    const g = soloState.guesses[i];
+    const pair = document.createElement('div');
+    pair.className = 'result-pair';
+    pair.innerHTML = `
+      <div class="result-swatch" style="background:${hsbToHex(c.h,c.s,c.b)}"></div>
+      <div class="result-swatch" style="background:${hsbToHex(g.h,g.s,g.b)}"></div>
+      <div class="result-score-mini">${colorScores[i]}</div>
+    `;
+    rc.appendChild(pair);
+  });
+
+  document.getElementById('sp-round-score').textContent = avg;
+  document.getElementById('sp-total-score').textContent = soloState.totalScore;
+  document.getElementById('sp-round-progress').textContent = `${soloState.round}/${soloState.totalRounds}`;
+  document.getElementById('sp-continue-btn').textContent = soloState.round >= soloState.totalRounds ? 'Endergebnis' : 'Nächste Runde →';
+  showScreen('screen-solo-results');
+}
+
+function spNextRound() {
+  if (soloState.round >= soloState.totalRounds) {
+    soloShowFinal();
+    return;
+  }
+  soloState.round++;
+  soloPlayRound();
+}
+
+function soloShowFinal() {
+  const s = soloState.totalScore;
+  document.getElementById('sp-final-score').textContent = s;
+  const msgs = [
+    [0, 40, 'Du brauchst noch etwas Übung. 🎨'],
+    [40, 60, 'Solides Farbgefühl. Weiter so!'],
+    [60, 75, 'Beeindruckend! Dein Auge ist geschärft.'],
+    [75, 88, 'Fast perfekt. Du hast ein natürliches Talent!'],
+    [88, 101, 'Außergewöhnlich. Du siehst Farben wie ein Profi! 🏆']
+  ];
+  const m = msgs.find(([lo, hi]) => s >= lo && s < hi) || msgs[msgs.length - 1];
+  document.getElementById('sp-final-msg').textContent = m[2];
+  showScreen('screen-solo-final');
+}
+
+// ─── MULTIPLAYER ──────────────────────────────────────────────────────────────
+
+let ws = null;
+let mpState = {
+  playerId: null, roomCode: null, isHost: false,
+  currentColors: [], guesses: [], currentIdx: 0,
+  round: 1, totalRounds: 3, timer: null, mpRounds: 3
+};
+
+function getWsUrl() {
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  return `${proto}://${location.host}`;
+}
+
+function connectWS(cb) {
+  if (ws && ws.readyState === WebSocket.OPEN) { cb(); return; }
+  ws = new WebSocket(getWsUrl());
+  ws.onopen = cb;
+  ws.onmessage = e => handleMessage(JSON.parse(e.data));
+  ws.onclose = () => {
+    document.getElementById('mp-error') && (document.getElementById('mp-error').textContent = 'Verbindung getrennt.');
   };
-
-  const sc = calcScore(color,guess);
-
-  document.getElementById("colorBox").style.background =
-    hsbToHex(color.h,color.s,color.b);
-
-  document.getElementById("score").innerText =
-    "Score: " + sc;
-
-  setTimeout(start,2000);
+  ws.onerror = () => {
+    setMpError('Verbindungsfehler. Bitte neu laden.');
+  };
 }
 
-// INIT
-start();
+function setMpError(msg) {
+  ['mp-error', 'lobby-error'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = msg;
+  });
+}
+
+function send(obj) {
+  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(obj));
+}
+
+let mpSelectedRounds = 3;
+
+function selectMPRounds(el, r) {
+  document.querySelectorAll('#rounds-sel-wrap .round-sel').forEach(b => b.classList.remove('active-sel'));
+  el.classList.add('active-sel');
+  mpSelectedRounds = r;
+}
+
+function createRoom() {
+  const name = document.getElementById('mp-name').value.trim();
+  if (!name) { setMpError('Bitte Namen eingeben'); return; }
+  connectWS(() => send({ type: 'create_room', name, rounds: mpSelectedRounds }));
+}
+
+function joinRoom() {
+  const name = document.getElementById('mp-name').value.trim();
+  const code = document.getElementById('mp-join-code').value.trim().toUpperCase();
+  if (!name) { setMpError('Bitte Namen eingeben'); return; }
+  if (!code) { setMpError('Bitte Raumcode eingeben'); return; }
+  connectWS(() => send({ type: 'join_room', name, code }));
+}
+
+function sendStartGame() {
+  send({ type: 'start_game' });
+}
+
+function handleMessage(msg) {
+  switch (msg.type) {
+    case 'error': setMpError(msg.msg); break;
+    case 'room_created':
+      mpState.playerId = msg.playerId;
+      mpState.roomCode = msg.code;
+      mpState.isHost = true;
+      showLobby(msg.state);
+      break;
+    case 'room_joined':
+      mpState.playerId = msg.playerId;
+      mpState.roomCode = msg.code;
+      mpState.isHost = false;
+      showLobby(msg.state);
+      break;
+    case 'player_joined':
+    case 'player_left':
+      updateLobbyPlayers(msg.state);
+      break;
+    case 'game_started':
+      mpState.totalRounds = msg.state.totalRounds;
+      mpState.round = 1;
+      break;
+    case 'round_start':
+      mpState.round = msg.round;
+      mpState.totalRounds = msg.totalRounds;
+      mpState.currentColors = msg.colors;
+      mpState.guesses = Array.from({ length: 1 }, () => ({ h: 180, s: 50, b: 50 }));
+      mpState.currentIdx = 0;
+      showMPGame(msg.colors);
+      break;
+    case 'guess_phase':
+      mpStartGuessing();
+      break;
+    case 'player_finished':
+      document.getElementById('mp-finished-count').textContent = `${msg.finished} / ${msg.total} fertig`;
+      document.getElementById('mp-finished-count2').textContent = `${msg.finished} / ${msg.total} fertig`;
+      break;
+    case 'round_results':
+      showMPResults(msg);
+      break;
+    case 'next_round_countdown':
+      document.getElementById('mp-next-countdown').textContent = 'Nächste Runde startet in 3 Sekunden…';
+      break;
+    case 'game_over':
+      showMPFinal(msg.results);
+      break;
+    case 'back_to_lobby':
+      showLobby(msg.state);
+      break;
+  }
+}
+
+function showLobby(state) {
+  document.getElementById('lobby-code').textContent = mpState.roomCode;
+  updateLobbyPlayers(state);
+  const isHost = state.players.find(p => p.id === mpState.playerId)?.isHost;
+  document.getElementById('start-game-btn').style.display = isHost ? 'block' : 'none';
+  document.getElementById('lobby-waiting').style.display = isHost ? 'none' : 'flex';
+  document.getElementById('rounds-sel-wrap').style.opacity = isHost ? '1' : '0.4';
+  document.getElementById('rounds-sel-wrap').style.pointerEvents = isHost ? 'auto' : 'none';
+  showScreen('screen-lobby');
+}
+
+function updateLobbyPlayers(state) {
+  const list = document.getElementById('lobby-players');
+  list.innerHTML = '';
+  state.players.forEach(p => {
+    const pill = document.createElement('div');
+    pill.className = 'player-pill';
+    pill.innerHTML = `<div class="dot"></div><span>${p.name}</span>${p.isHost ? '<span class="host-badge">Host</span>' : ''}`;
+    list.appendChild(pill);
+  });
+  document.getElementById('lobby-status').textContent = `${state.players.length} Spieler im Raum`;
+}
+
+function showMPGame(colors) {
+  document.getElementById('mp-round-label').textContent = `Runde ${mpState.round} / ${mpState.totalRounds}`;
+  document.getElementById('mp-phase-label').textContent = 'Farben einprägen…';
+  document.getElementById('mp-guess-area').style.display = 'none';
+  document.getElementById('mp-waiting-phase').style.display = 'none';
+  document.getElementById('mp-finished-count').textContent = '';
+  document.getElementById('mp-finished-count2').textContent = '';
+
+  const row = document.getElementById('mp-colors');
+  row.innerHTML = '';
+  colors.forEach(c => {
+    const s = document.createElement('div');
+    s.className = 'color-swatch';
+    s.style.background = hsbToHex(c.h, c.s, c.b);
+    row.appendChild(s);
+  });
+
+  showScreen('screen-mp-game');
+  mpShowTimer(4000, 'mp-timer', () => {});
+}
+
+function mpShowTimer(duration, barId, cb) {
+  clearInterval(mpState.timer);
+  const bar = document.getElementById(barId);
+  const start = Date.now();
+  bar.style.width = '100%';
+  mpState.timer = setInterval(() => {
+    const elapsed = Date.now() - start;
+    const pct = Math.max(0, 100 - (elapsed / duration * 100));
+    bar.style.width = pct + '%';
+    if (elapsed >= duration) { clearInterval(mpState.timer); cb(); }
+  }, 50);
+}
+
+function mpStartGuessing() {
+  document.getElementById('mp-phase-label').textContent = 'Farben nachbilden';
+  document.querySelectorAll('#mp-colors .color-swatch').forEach(s => s.classList.add('covered'));
+  document.getElementById('mp-guess-area').style.display = 'block';
+  document.getElementById('mp-timer').style.width = '0%';
+  mpLoadGuess(0);
+  buildDots('mp-dots', 1);
+}
+
+function mpLoadGuess(idx) {
+  mpState.currentIdx = idx;
+  const g = mpState.guesses[idx];
+  document.getElementById('mp-cur-idx').textContent = idx + 1;
+  document.getElementById('mp-h').value = g.h;
+  document.getElementById('mp-s').value = g.s;
+  document.getElementById('mp-b').value = g.b;
+  updateMPPreview();
+  updateDots('mp-dots', idx, mpState.guesses.length);
+  document.getElementById('mp-prev-btn').disabled = idx === 0;
+  document.getElementById('mp-next-btn').textContent = idx === mpState.guesses.length - 1 ? 'Abgeben ✓' : 'Weiter →';
+}
+
+function saveMPGuess() {
+  mpState.guesses[mpState.currentIdx] = {
+    h: parseInt(document.getElementById('mp-h').value),
+    s: parseInt(document.getElementById('mp-s').value),
+    b: parseInt(document.getElementById('mp-b').value)
+  };
+}
+
+function mpNavigate(dir) {
+  saveMPGuess();
+  const next = mpState.currentIdx + dir;
+  if (next < 0) return;
+  if (next >= mpState.guesses.length) { mpSubmitGuesses(); return; }
+  mpLoadGuess(next);
+}
+
+function updateMPPreview() {
+  const h = document.getElementById('mp-h').value;
+  const s = document.getElementById('mp-s').value;
+  const b = document.getElementById('mp-b').value;
+  document.getElementById('mp-h-val').textContent = h;
+  document.getElementById('mp-s-val').textContent = s;
+  document.getElementById('mp-b-val').textContent = b;
+  document.getElementById('mp-preview').style.background = hsbToHex(+h, +s, +b);
+}
+
+function mpSubmitGuesses() {
+  saveMPGuess();
+  send({ type: 'submit_guesses', guesses: mpState.guesses });
+  document.getElementById('mp-guess-area').style.display = 'none';
+  document.getElementById('mp-waiting-phase').style.display = 'block';
+  document.getElementById('mp-wait-msg').textContent = 'Deine Antworten wurden abgegeben!';
+}
+
+function showMPResults(msg) {
+  document.getElementById('mp-result-round').textContent = `Runde ${mpState.round} / ${mpState.totalRounds}`;
+
+  const rc = document.getElementById('mp-result-colors');
+  rc.innerHTML = '';
+  const colors = msg.colors;
+  const myGuesses = msg.guesses[mpState.playerId] || [];
+
+  colors.forEach((c, i) => {
+    const g = myGuesses[i] || { h: 0, s: 0, b: 0 };
+    const pair = document.createElement('div');
+    pair.className = 'result-pair';
+    pair.innerHTML = `
+      <div class="result-swatch" style="background:${hsbToHex(c.h,c.s,c.b)}"></div>
+      <div class="result-swatch" style="background:${hsbToHex(g.h,g.s,g.b)}"></div>
+    `;
+    rc.appendChild(pair);
+  });
+
+  const list = document.getElementById('mp-result-players');
+  list.innerHTML = '';
+  const sorted = [...msg.results].sort((a, b) => b.totalScore - a.totalScore);
+  sorted.forEach((p, idx) => {
+    const card = document.createElement('div');
+    card.className = 'score-card' + (idx === 0 ? ' winner' : '');
+    const isMe = p.id === mpState.playerId;
+    card.innerHTML = `
+      <span class="rank">${idx + 1}.</span>
+      <span class="name">${p.name}${isMe ? ' <span style="color:var(--muted);font-size:0.65rem">(Du)</span>' : ''}</span>
+      <span class="pts">${p.totalScore}</span>
+    `;
+    list.appendChild(card);
+  });
+
+  document.getElementById('mp-next-countdown').textContent = '';
+  showScreen('screen-mp-results');
+}
+
+function showMPFinal(results) {
+  const list = document.getElementById('mp-final-players');
+  list.innerHTML = '';
+  results.forEach((p, idx) => {
+    const card = document.createElement('div');
+    card.className = 'score-card' + (idx === 0 ? ' winner' : '');
+    const isMe = p.id === mpState.playerId;
+    card.innerHTML = `
+      <span class="rank">${['🥇','🥈','🥉'][idx] || (idx+1+'.')}</span>
+      <span class="name">${p.name}${isMe ? ' <span style="color:var(--muted);font-size:0.65rem">(Du)</span>' : ''}</span>
+      <span class="pts">${p.score}</span>
+    `;
+    list.appendChild(card);
+  });
+
+  const btns = document.getElementById('mp-final-btns');
+  const isHost = mpState.isHost;
+  btns.innerHTML = isHost
+    ? `<button class="btn primary full" onclick="send({type:'play_again'})">Nochmal spielen</button>
+       <button class="btn full" style="margin-top:0.5rem" onclick="showScreen('screen-home')">Hauptmenü</button>`
+    : `<p style="text-align:center">Warte auf Host…</p>
+       <button class="btn full" style="margin-top:1rem" onclick="showScreen('screen-home')">Hauptmenü</button>`;
+
+  showScreen('screen-mp-final');
+}
+
+// Init preview
+updateSPPreview();
+updateMPPreview();
 </script>
-
 </body>
 </html>
